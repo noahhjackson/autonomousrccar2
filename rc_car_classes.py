@@ -1,7 +1,9 @@
 try:
     from machine import Pin, PWM, ADC
+    from time import sleep_us, ticks_us
 except:
     print("Pico code invalid, must run in simulation mode")
+
 
 class Servo:
     def __init__(self, pwm_pin, pwm_freq, E_stop_pin, E_stop_value, simulation, *args):
@@ -143,5 +145,41 @@ class Potentiometer:
             else:
                 pot_reading = self.max
                 return pot_reading
+        else:
+            return simulation_value
+
+
+class Ultrasonic:
+    def __init__(self, trig_pin, echo_pin, simulation):
+        self.trig_pin = trig_pin
+        self.echo_pin = echo_pin
+
+        if simulation == False:
+            self.trig = Pin(self.trig_pin, mode=Pin.OUT)
+            self.echo = Pin(self.echo_pin, mode=Pin.IN)
+
+    def read(self, simulation, simulation_value):
+        if simulation == False:
+
+            timepassed = 0
+            signalon = 0
+            signaloff = 0
+            
+            self.trig.low()
+            sleep_us(2)
+            self.trig.high()
+            sleep_us(10)
+            self.trig.low()           
+            while self.echo.value() == 0:
+                signaloff = ticks_us()
+            while self.echo.value() == 1:
+                signalon = ticks_us()
+            timepassed = signalon - signaloff
+
+            distance_mm = (timepassed * 0.343) / 2
+            distance_mm = round(distance_mm, 2)
+
+            return distance_mm
+                    
         else:
             return simulation_value
