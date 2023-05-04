@@ -27,20 +27,6 @@ pwm_steer.freq(50)
 def convert(x, in_min, in_max, out_min, out_max):
     return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min
 
-def ultra():
-    trigger.low()
-    sleep_us(2)
-    trigger.high()
-    sleep_us(5)
-    trigger.low()
-    while echo.value() == 0:
-       signaloff = ticks_us()    
-    while echo.value() == 1:
-       signalon = ticks_us()
-    timepassed = signalon - signaloff
-    distance = (timepassed * 0.0343) / 2
-    return distance
-
 while True:
     Steer_Alog = Steer_pot.read_u16()
     Drive_Alog = Drive_pot.read_u16()  
